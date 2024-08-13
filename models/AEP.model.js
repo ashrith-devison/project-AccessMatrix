@@ -26,6 +26,18 @@ const AEPschema = new mongoose.Schema({
     status : {
         Enumerator: ['Active', 'Inactive','Block'],
         required: true
+    },
+    Name : {
+        type: String,
+        required: true
+    },
+    Designation : {
+        type: String,
+        required: true
+    },
+    organization : {
+        type: String,
+        required: true
     }
 });
 
