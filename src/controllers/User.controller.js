@@ -125,7 +125,6 @@ const forgotPassword = asyncHandler(async(req,res)=>{
     }
     const resetToken = user.generatePasswordResetToken();
     // need to complete this code
-
  })
 
 export { registerSecurityEmployee, loginUser, logoutUser,changePassword,forgotPassword }
