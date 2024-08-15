@@ -1,16 +1,73 @@
-const mongoose = require('mongoose');
+import mongoose,{Schema} from 'mongoose';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 
-const userSchema = new mongoose.Schema({
-    deviceId : {
+const userSchema = new Schema({
+    employeeId:{
+        type: String,
+        required: true,
+        unique: true
+    },
+    employeeName:{
         type: String,
         required: true
     },
-    location : {
-        Enumerator: ['ATC', 'Main', 'CNS'],
+    email:{
+        type: String,
+        required: [true,'email is required'],
+        unique: true
     },
-    role : {
-        Enumerator: ['Admin', 'Security','Device'],
-    }
+    password:{
+        type: String,
+        required: [true,'password is required'],
+
+    },
+    refreshToken:{
+        type: String,
+    },
+    // deviceId : {
+    //     type: String,
+    //     required: true
+    // },
+},{
+    timestamps: true
 });
 
-module.exports = mongoose.model('Users', userSchema);
+userSchema.pre("save", async function(next){
+    if(!this.isModified("password")){
+        return next();
+    }
+
+    this.password = await bcrypt.hash(this.password, 10)
+    next();
+})
+
+userSchema.methods.matchPassword = async function(enteredPassword){
+    return await bcrypt.compare(enteredPassword, this.password)
+}
+
+userSchema.methods.generateAccessToken = function(){
+    return jwt.sign(
+        {_id : this._id,
+        email : this.email,
+        employeeId : this.employeeId,
+        employeeName : this.employeeName, },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn: process.env.ACCESS_TOKEN_LIFE
+        }
+    )
+}
+
+userSchema.methods.generateRefreshToken = function(){
+    return jwt.sign(
+        {_id : this._id,
+         },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: process.env.REFRESH_TOKEN_LIFE
+        }
+    )
+}
+
+export const User = mongoose.model('User',userSchema)
