@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose ,{ Schema} from 'mongoose'
 
 const AEPschema = new mongoose.Schema({
     AEPId : {
@@ -27,18 +27,12 @@ const AEPschema = new mongoose.Schema({
         Enumerator: ['Active', 'Inactive','Block'],
         required: true
     },
-    Name : {
-        type: String,
-        required: true
-    },
-    Designation : {
-        type: String,
-        required: true
-    },
-    organization : {
-        type: String,
-        required: true
+    employee :{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
     }
+},{
+    timestamps: true
 });
 
-module.exports = mongoose.model('AEP', AEPschema);
+export const AEP = mongoose.model('AEP',AEPschema)
