@@ -8,14 +8,14 @@ const AEPschema = new mongoose.Schema({
     },
     Locations : {
         type: [String],
-        Enumerator: ['ATC', 'Main', 'CNS'],
+        enum: ['ATC', 'Main', 'CNS'],
         required: true
     },
     DateofIssue : {
         type: Date,
         required: true
     },
-    DateofExpiry : {
+    AEPValidity : {
         type: Date,
         required: true
     },
@@ -24,13 +24,10 @@ const AEPschema = new mongoose.Schema({
         required: true
     },
     status : {
-        Enumerator: ['Active', 'Inactive','Block'],
+        type: String,
+        enum: ['Active', 'Inactive','Block'],
         required: true
     },
-    employee :{
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-    }
 },{
     timestamps: true
 });
