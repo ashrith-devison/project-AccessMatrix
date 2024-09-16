@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import {verifyJWT} from '../middlewares/auth.middleware.js';
 import {
-    registerEmployee,
+    registerSecurityEmployee as registerEmployee,
     loginUser,
     logoutUser,
     changePassword,
