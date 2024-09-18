@@ -24,8 +24,11 @@ app.use(express.static('public'));
 app.use(cookieParser());
 
 import userRouter from "./routes/user.routes.js"
+import QrRouter from "./routes/qr.routes.js";
+import AEP from "./routes/AEP.routes.js";
 
-
-app.use('/api/v1/users', userRouter);
+app.use('/api/users', userRouter);
+app.use('/api/AEP',QrRouter);
+app.use('/api/admin/AEP',AEP);
 
 export { app };

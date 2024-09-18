@@ -25,10 +25,11 @@ const userSchema = new Schema({
     refreshToken:{
         type: String,
     },
-    // deviceId : {
-    //     type: String,
-    //     required: true
-    // },
+    loginType : {
+        type : String,
+        enum : ['security','admin'],
+        required : [true,'only Security and Admin Login are allowed'],
+    },
 },{
     timestamps: true
 });
@@ -42,8 +43,8 @@ userSchema.pre("save", async function(next){
     next();
 })
 
-userSchema.methods.matchPassword = async function(enteredPassword){
-    return await bcrypt.compare(enteredPassword, this.password)
+userSchema.methods.matchPassword = async function(enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
 }
 
 userSchema.methods.generateAccessToken = function(){

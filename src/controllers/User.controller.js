@@ -3,24 +3,34 @@ import { User } from "../models/users.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import {ApiResponse } from "../utils/ApiResponse.js";
 
-const generateAccessAndRefreshToken = async(userId)=>{
-    try{
+const generateAccessAndRefreshToken = async (userId) => {
+    try {
+        console.log(`Generating tokens for userId: ${userId}`);
+        
         const user = await User.findById(userId);
+        if (!user) {
+            throw new ApiError(404, 'User not found');
+        }
+        console.log(`User found: ${user}`);
+
         const accessToken = user.generateAccessToken();
         const refreshToken = user.generateRefreshToken();
+        console.log(`Access Token: ${accessToken}`);
+        console.log(`Refresh Token: ${refreshToken}`);
 
         user.refreshToken = refreshToken;
-        await user.save({validateBeforeSave: false});
-        return {accessToken, refreshToken};
+        await user.save({ validateBeforeSave: false });
+        return { accessToken, refreshToken };
 
-    } catch(error){
+    } catch (error) {
+        console.error('Error in generateAccessAndRefreshToken:', error);
         throw new ApiError(500, 'Token generation failed');
     }
 }
 
 const registerSecurityEmployee = asyncHandler(async (req,res)=>{
-    const { employeeId, employeeName, email, password, location, role } = req.body;
-    if([employeeId,employeeName,email,password,role,location].some((field)=>field?.trim() === '')){
+    const { employeeId, employeeName, email, password, location, role,loginType,AdpAvailable } = req.body;
+    if([employeeId,employeeName,email,password,role,location,loginType].some((field)=>field?.trim() === '')){
         throw new ApiError(400, 'All fields are required');
     }
     const existedUser = await User.findOne(
@@ -34,13 +44,12 @@ const registerSecurityEmployee = asyncHandler(async (req,res)=>{
         employeeName,
         email,
         password,
+        loginType
     });
     const createdUser = await User.findById(user._id).select(
         "-password -refreshToken"
     );
-    return res
-    .status(201)
-    .json(new ApiResponse(201, {user: createdUser}, "Employee registered successfully"))
+    return ApiResponse.success(res,{user: createdUser}, "Employee registered successfully");
 })
 
 const loginUser = asyncHandler(async (req,res)=>{
@@ -49,14 +58,11 @@ const loginUser = asyncHandler(async (req,res)=>{
         throw new ApiError(400, 'Employee ID and Password are required');
     }
     const user = await User.findOne({employeeId});
-    if(!user){
-        throw new ApiError(404, 'Employee not found');
-    }
+    if(!user) throw new ApiError(404, 'Employee not found');
 
-    const isPasswordMatch  = await User.matchPassword(password);
-    if(!isPasswordMatch){
-        throw new ApiError(401, 'Password is incorrect');
-    }
+    const isPasswordMatch  = await user.matchPassword(password);
+    if(!isPasswordMatch) throw new ApiError(401, 'Password is incorrect');
+
     const {accessToken , refreshToken} = await generateAccessAndRefreshToken(user._id);
 
     const loggedInUser = await User.findById(user._id).select('-password');

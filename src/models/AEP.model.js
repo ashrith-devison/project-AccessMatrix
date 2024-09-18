@@ -15,7 +15,7 @@ const AEPschema = new mongoose.Schema({
         type: Date,
         required: true
     },
-    AEPValidity : {
+    DateofExpiry : {
         type: Date,
         required: true
     },
@@ -28,6 +28,9 @@ const AEPschema = new mongoose.Schema({
         enum: ['Active', 'Inactive','Block'],
         required: true
     },
+    AdpAvailable : {
+        type : Boolean,
+    }
 },{
     timestamps: true
 });

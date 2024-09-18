@@ -6,8 +6,8 @@ class ApiResponse{
         this.success = statusCode < 400
     }
 
-    static success(data,message){
-        return new ApiResponse(200,data,message)
+    static success(res,data,message){
+        return res.status(200).json(new ApiResponse(201,data,message))
     }
 }
 

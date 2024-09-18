@@ -2,7 +2,7 @@ class ApiError extends Error{
     constructor(
         statusCode,
         message = "Internal Server Error",
-        error = [],
+        errors = [],
         stack = ""
     ){
         super(message)
@@ -19,15 +19,15 @@ class ApiError extends Error{
         }
     }
 
-    static badRequest(message = "Bad Request", errors = []){
-        return new ApiError(400, message, errors)
-    }
-    static unauthorized(message = "Unauthorized", errors = []){
-        return new ApiError(401, message, errors)
-    }
-    static forbidden(message = "Forbidden", errors = []){
-        return new ApiError(403, message, errors)
-    }
+    // static badRequest(message = "Bad Request", errors = []){
+    //     return new ApiError(400, message, errors)
+    // }
+    // static unauthorized(message = "Unauthorized", errors = []){
+    //     return new ApiError(401, message, errors)
+    // }
+    // static forbidden(message = "Forbidden", errors = []){
+    //     return new ApiError(403, message, errors)
+    // }
 }
 
 export { ApiError };
