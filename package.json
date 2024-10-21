@@ -22,6 +22,7 @@
     "mongoose": "^8.5.2",
     "mongoose-aggregate-paginate-v2": "^1.1.2",
     "prettier": "^3.3.3",
+    "vercel": "^37.11.0",
     "zonalentry": "file:"
   },
   "devDependencies": {

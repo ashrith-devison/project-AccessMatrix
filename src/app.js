@@ -27,6 +27,10 @@ import userRouter from "./routes/user.routes.js"
 import QrRouter from "./routes/qr.routes.js";
 import AEP from "./routes/AEP.routes.js";
 
+app.get('/',(req,res)=>{
+    res.send("<h1>Backend Server is Initiated</h1>");
+});
+
 app.use('/api/users', userRouter);
 app.use('/api/AEP',QrRouter);
 app.use('/api/admin/AEP',AEP);
