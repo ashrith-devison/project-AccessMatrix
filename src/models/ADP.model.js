@@ -40,18 +40,6 @@ const ADPschema = new mongoose.Schema({
         ref: 'AEP',
         required: true
     },
-    DLId:{
-        type: String,
-        required: true
-    },
-    DLValidity:{
-        type: Date,
-        required: true
-    },
-    DateofPayment:{
-        type: Date,
-        required: true
-    },
     status: {
         type: String,
         enum: ['Active', 'Inactive', 'Block'],

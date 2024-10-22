@@ -3,11 +3,13 @@ import {ApiError} from '../utils/ApiError.js';
 import {asyncHandler} from '../utils/asyncHandler.js';
 import {ADP} from '../models/ADP.model.js';
 import {AEP} from '../models/AEP.model.js';
-
+import {decode} from '../utils/encode&decode.util.js';
+import {AddSessionData, GetSessionData} from '../utils/session-manager.js';
 const createADP = asyncHandler(async (req, res) => {
     
     const { ADPId , DateofIssue, ADPValidity, AuthorizedBy, Name, Designation, Organization, Violation,AEPId, DLId, DLValidity, DateofPayment, status } = req.body;
-    const aep = await AEP.findById(AEPId);
+    const aep = await AEP.findOne({AEPId});
+    console.log(AEPId);
     
     if (!aep) {
         throw new ApiError(404, 'AEP not found');
@@ -23,12 +25,10 @@ const createADP = asyncHandler(async (req, res) => {
         Organization,
         Violation,
         AEP: aep._id,
-        DLId,
-        DLValidity,
-        DateofPayment,
         status
     });
     
+
     return res
     .status(201)
     .json(new ApiResponse(201, {ADP}, 'ADP created successfully'));
@@ -93,10 +93,27 @@ const deleteADP = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, 'ADP deleted successfully'));
 });
 
+const verifyADP = asyncHandler(async (req, res) => {
+    const ADPId = req.params.id;
+    if (!ADPId) {
+        throw new ApiError(400, 'ADP ID is required');
+    }
+    let adp_temp = decode(ADPId);
+    const adp = await ADP.findById(adp_temp);
+    if (!adp) {
+        throw new ApiError(404, 'ADP not found');
+    }
+    const data = await AddSessionData('ADP', adp, req);
+    return res.cookie('SESSIONDATA', data, { httpOnly: true }).status(200).
+    json({ message: 'ADP Details Fetched Successfully', ADP: adp , AEP: GetSessionData('AEP', req) });
+});
+
+
 export {
     createADP,
     getADPs,
     getADP,
     updateADP,
-    deleteADP
+    deleteADP,
+    verifyADP
 }

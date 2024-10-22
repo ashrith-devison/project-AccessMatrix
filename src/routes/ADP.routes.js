@@ -1,15 +1,19 @@
-import {Route} from "express"
+import { Router } from 'express';
 import {
     createADP,
     getADP,
     getADPs,
     updateADP,
-    deleteADP
-} from "../controllers/ADP.controller.js"
+    deleteADP,
+    verifyADP,
+} from "../controllers/ADP.controller.js";
 
-const router = Route()
+const router = Router(); 
 
-router.route('/').post(createADP).get(getADPs)
-router.route('/:id').get(getADP).put(updateADP).delete(deleteADP)
+import ADPchain from '../middlewares/scanning.middleware.js';
 
-export default router
+router.route('/').post(createADP).get(getADPs);
+router.route('/getADP/:id').get(getADP).put(updateADP).delete(deleteADP);
+router.route('/verify/:id').get(ADPchain,verifyADP);
+
+export default router;
