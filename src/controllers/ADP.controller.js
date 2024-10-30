@@ -7,7 +7,7 @@ import {decode} from '../utils/encode&decode.util.js';
 import {AddSessionData, GetSessionData} from '../utils/session-manager.js';
 const createADP = asyncHandler(async (req, res) => {
     
-    const { ADPId , DateofIssue, ADPValidity, AuthorizedBy, Name, Designation, Organization, Violation,AEPId, DLId, DLValidity, DateofPayment, status } = req.body;
+    const { ADPId , DateofIssue, ADPValidity, AuthorizedBy, Name, Designation, Organization, Violation,AEPId } = req.body;
     const aep = await AEP.findOne({AEPId});
     console.log(AEPId);
     

@@ -46,4 +46,7 @@ app.use('/api/ADP',ADP);
 app.use('/api/admin/AEP',AEP);
 app.use('/api/utils',encodeUtils);
 
+import AVP from "./routes/AVP.routes.js";
+app.use('/api/AVP',AVP);
+
 export { app };
