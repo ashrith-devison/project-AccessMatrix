@@ -22,8 +22,9 @@ app.use(express.urlencoded({
 app.use(express.static('public')); 
 app.use(cookieParser());
 
+import {encode} from "./utils/encode&decode.util.js";
 app.use((req, res, next) => {
-    res.cookie('SESSIONDATA',"{}",{
+    res.cookie('SESSIONDATA',encode("{}"),{
         httpOnly: true,
         secure : true,
         sameSite : 'Strict'

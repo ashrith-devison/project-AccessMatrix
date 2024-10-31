@@ -16,7 +16,7 @@ const qrverify = asyncHandler(async (req, res) => {
         if (!AEPData) throw new ApiError(405, "AEP Not Found");
         console.log(AEPData);
         const data = await AddSessionData("AEP", AEPData,req);
-        return res.cookie('SESSIONDATA', data, { httpOnly: true }).status(200).json({ message: "AEP Details Fetched Successfully" });
+        return res.cookie('SESSIONDATA', data, { httpOnly: true }).status(200).json({ message: "AEP Details Fetched Successfully" , data : AEPData});
 
     } catch (error) {
         throw new ApiError(405, error.message);
