@@ -41,4 +41,4 @@ const AVPschema = new mongoose.Schema({
     },
 },{timestamps: true});
 
-export const ADP = mongoose.model('AVP', AVPschema);
+export const AVP = mongoose.model('AVP', AVPschema);
