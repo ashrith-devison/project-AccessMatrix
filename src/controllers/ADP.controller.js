@@ -7,10 +7,9 @@ import {decode} from '../utils/encode&decode.util.js';
 import {AddSessionData, GetSessionData} from '../utils/session-manager.js';
 const createADP = asyncHandler(async (req, res) => {
     
-    const { ADPId , DateofIssue, ADPValidity, AuthorizedBy, Name, Designation, Organization, Violation,AEPId } = req.body;
+    const { ADPId , DateofIssue, ADPValidity, AuthorizedBy, Name, Designation, Organization, Violation,AEPId, status } = req.body;
     const aep = await AEP.findOne({AEPId});
-    console.log(AEPId);
-    
+    console.log(aep);
     if (!aep) {
         throw new ApiError(404, 'AEP not found');
     }
@@ -27,6 +26,7 @@ const createADP = asyncHandler(async (req, res) => {
         AEP: aep._id,
         status
     });
+    
     
 
     return res
