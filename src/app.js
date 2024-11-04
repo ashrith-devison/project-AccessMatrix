@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 const app = express();
 app.use(
     cors({
-        origin: process.env.CLIENT_URL, // allow to server to accept request from different origin
+        origin: '*', // allow to server to accept request from different origin
         credentials: true,
     })
 )
