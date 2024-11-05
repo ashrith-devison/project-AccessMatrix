@@ -27,7 +27,7 @@ const createAVP = asyncHandler(async(req,res) => {
     json(new ApiResponse(201,{AVP},"Creation of AVP is done"));
 });
 
-const getAVPs = asyncHandler(async(req,res)=>{
+const getAVP = asyncHandler(async(req,res)=>{
     const Avpid = req.params.id;
     if(!Avpid){
         throw ApiError.badRequest("AVP ID is required");
@@ -57,6 +57,6 @@ const verifyAVP = asyncHandler(async(req, res)=>{
 })
 export {
     createAVP,
-    getAVPs,
+    getAVP,
     verifyAVP
 }

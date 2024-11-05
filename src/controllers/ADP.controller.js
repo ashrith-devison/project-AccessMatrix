@@ -105,8 +105,8 @@ const verifyADP = asyncHandler(async (req, res) => {
     if (!adp) {
         throw new ApiError(404, 'ADP not found');
     }
-    const data = await AddSessionData('ADP', adp, req);
-    return res.cookie('SESSIONDATA', data, { httpOnly: true }).status(200).
+    // const data = await AddSessionData('ADP', adp, req);
+    return res.cookie('SESSIONDATA', adp_temp, { httpOnly: true }).status(200).
     json({ message: 'ADP Details Fetched Successfully', ADP: adp , AEP: GetSessionData('AEP', req) });
 });
 
