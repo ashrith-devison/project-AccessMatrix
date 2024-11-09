@@ -5,12 +5,13 @@ import {ADP} from '../models/ADP.model.js';
 import {AEP} from '../models/AEP.model.js';
 import {decode} from '../utils/encode&decode.util.js';
 import {AddSessionData, GetSessionData} from '../utils/session-manager.js';
+
+
 const createADP = asyncHandler(async (req, res) => {
     
-    const { ADPId , DateofIssue, ADPValidity, AuthorizedBy, Name, Designation, Organization, Violation,AEPId, DLId, DLValidity, DateofPayment, status } = req.body;
+    const { ADPId , DateofIssue, ADPValidity, AuthorizedBy, Name, Designation, Organization, Violation,AEPId, status } = req.body;
     const aep = await AEP.findOne({AEPId});
-    console.log(AEPId);
-    
+    console.log(aep);
     if (!aep) {
         throw new ApiError(404, 'AEP not found');
     }
@@ -28,6 +29,8 @@ const createADP = asyncHandler(async (req, res) => {
         status
     });
     
+    
+
     return res
     .status(201)
     .json(new ApiResponse(201, {ADP}, 'ADP created successfully'));
@@ -102,8 +105,8 @@ const verifyADP = asyncHandler(async (req, res) => {
     if (!adp) {
         throw new ApiError(404, 'ADP not found');
     }
-    const data = await AddSessionData('ADP', adp, req);
-    return res.cookie('SESSIONDATA', data, { httpOnly: true }).status(200).
+    // const data = await AddSessionData('ADP', adp, req);
+    return res.cookie('SESSIONDATA', adp_temp, { httpOnly: true }).status(200).
     json({ message: 'ADP Details Fetched Successfully', ADP: adp , AEP: GetSessionData('AEP', req) });
 });
 

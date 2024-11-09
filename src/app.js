@@ -22,8 +22,9 @@ app.use(express.urlencoded({
 app.use(express.static('public')); 
 app.use(cookieParser());
 
+import {encode} from "./utils/encode&decode.util.js";
 app.use((req, res, next) => {
-    res.cookie('SESSIONDATA',"{}",{
+    res.cookie('SESSIONDATA',encode("{}"),{
         httpOnly: true,
         secure : true,
         sameSite : 'Strict'
@@ -45,5 +46,11 @@ app.use('/api/AEP',QrRouter);
 app.use('/api/ADP',ADP);
 app.use('/api/admin/AEP',AEP);
 app.use('/api/utils',encodeUtils);
+
+import AVP from "./routes/AVP.routes.js";
+app.use('/api/AVP',AVP);
+
+import logbook from "./routes/LogBook.routes.js";
+app.use('/api/log',logbook);
 
 export { app };
