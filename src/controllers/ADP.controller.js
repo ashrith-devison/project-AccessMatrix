@@ -28,7 +28,6 @@ const createADP = asyncHandler(async (req, res) => {
         status
     });
     
-
     return res
     .status(201)
     .json(new ApiResponse(201, {ADP}, 'ADP created successfully'));
