@@ -50,7 +50,21 @@ const createEntry = async (req, res) => {
     return ApiResponse.success(res, log, "Entry created successfully");
 };
 
+
+const getLogBookById = asyncHandler(async (req, res) => {
+    const { IdType, Id } = req.params;
+    const log = await logRecord.find({ validatedId: IdType, Id });
+    return ApiResponse.success(res, log, "Logbook fetched successfully");
+});
+
+const getAllLogBooks = asyncHandler(async (req, res) => {
+    const log = await logRecord.find();
+    return ApiResponse.success(res, log, "Logbook fetched successfully");
+});
+
 export {
     createEntry,
-    updateExitEntryOneTime as updateExitEntry
+    updateExitEntryOneTime as updateExitEntry,
+    getLogBookById,
+    getAllLogBooks
 };

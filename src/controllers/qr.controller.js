@@ -5,6 +5,7 @@ import { AEP as AEPs } from "../models/AEP.model.js";
 import { encode, decode } from "../utils/encode&decode.util.js";
 import { AddSessionData, DecodeCookie } from "../utils/session-manager.js";
 import axios from 'axios';
+import moment from 'moment-timezone';
 
 const qrverify = asyncHandler(async (req, res) => {
     const { id: tokenparam } = req.params;
@@ -51,6 +52,7 @@ const oneqr = asyncHandler(async (req, res) => {
     };
 
     try {
+        const currentDateIST = moment().tz("Asia/Kolkata").toDate();
         if ('aep' in data && data.aep && (data.option === 'driver' || data.option == 'employee')) {
             const response = await axios.get(`${process.env.API_URL}/api/AEP/${data.aep}`, {
                 headers: {
@@ -61,6 +63,11 @@ const oneqr = asyncHandler(async (req, res) => {
             responses.aep = response.data;
             packet.IdType = "AEP";
             packet.Id = data.aep;
+
+            if(new Date(response.data.DateofExpiry) < currentDateIST){
+                return ApiResponse.error(res, "AEP Expired", 405);
+            }
+
             if ('adp' in data && data.adp && data.option === 'driver'){
                 const response = await axios.get(`${process.env.API_URL}/api/ADP/getADP/${decode(data.adp)}`, {
                     headers: {
@@ -71,10 +78,14 @@ const oneqr = asyncHandler(async (req, res) => {
                 responses.adp = response.data;
                 packet.IdType = "ADP";
                 packet.Id = data.adp;
+
+                if(new Date(response.data.ADPValidity) < currentDateIST){
+                    return ApiResponse.error(res, "ADP Expired", 405);
+                }
             }
 
         }
-    
+        
 
         if ('avp' in data && data.avp && data.option === 'vehicle') {
             const avpData = decode(data.avp);
@@ -87,6 +98,10 @@ const oneqr = asyncHandler(async (req, res) => {
             responses.avp = response.data;
             packet.IdType = "AVP";
             packet.Id = data.avp;
+
+            if(new Date(response.data.AVPValidity) < currentDateIST){
+                return ApiResponse.error(res, "AVP Expired", 405);
+            }
         }
 
         packet.Id = decode(packet.Id);
