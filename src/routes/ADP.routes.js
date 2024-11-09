@@ -14,6 +14,6 @@ import {verifyAEP as ADPchain} from '../middlewares/scanning.middleware.js';
 
 router.route('/').post(createADP).get(getADPs);
 router.route('/getADP/:id').get(getADP).put(updateADP).delete(deleteADP);
-router.route('/verify/:id').get(ADPchain,verifyADP);
+router.route('/verify/:id').get(verifyADP);
 
 export default router;

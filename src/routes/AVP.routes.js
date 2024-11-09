@@ -1,12 +1,13 @@
 import {Router} from "express";
 import {
     createAVP,
-    getAVPs,
+    getAVP,
     verifyAVP
 } from "../controllers/AVP.controller.js";
 
 const router = Router();
 
-router.route('/').get(getAVPs);
+router.route('/:id').get(getAVP);
+router.route('/create').post(createAVP);
 
 export default router;

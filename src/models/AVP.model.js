@@ -34,11 +34,6 @@ const AVPschema = new mongoose.Schema({
         type: [String], // This should be an array of strings
         required: true
     },
-    status: {
-        type: String,
-        enum: ['Active', 'Inactive', 'Block'],
-        required: true
-    },
 },{timestamps: true});
 
 export const AVP = mongoose.model('AVP', AVPschema);

@@ -50,4 +50,7 @@ app.use('/api/utils',encodeUtils);
 import AVP from "./routes/AVP.routes.js";
 app.use('/api/AVP',AVP);
 
+import logbook from "./routes/LogBook.routes.js";
+app.use('/api/log',logbook);
+
 export { app };

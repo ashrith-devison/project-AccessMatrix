@@ -15,14 +15,13 @@ const qrverify = asyncHandler(async (req, res) => {
     try {
         const AEPData = await AEPs.findById(token);
         if (!AEPData) throw new ApiError(405, "AEP Not Found");
-
         if (!req.cookies.SESSIONDATA && req.headers.sessiondata) {
             const cookie = req.headers.sessiondata;
             const data = await DecodeCookie("AEP", AEPData, cookie);
             return res.cookie('SESSIONDATA', AEPData, { httpOnly: true }).status(200).json({ message: "AEP Details Fetched Successfully", data: AEPData });
         }
         const data = await AddSessionData("AEP", AEPData, req.cookies.SESSIONDATA);
-        return res.cookie('SESSIONDATA', AEPData, { httpOnly: true }).status(200).json({ message: "AEP Details Fetched Successfully", data: AEPData });
+        return res.cookie('SESSIONDATA', data, { httpOnly: true }).status(200).json({ message: "AEP Details Fetched Successfully", data: AEPData });
 
     } catch (error) {
         const errorMessage = error.message || "An unexpected error occurred";
@@ -44,10 +43,15 @@ const qrCreate = asyncHandler(async (req, res) => {
 });
 
 const oneqr = asyncHandler(async (req, res) => {
-    const { data } = req.body;
+    const { data, option } = req.body;
     let responses = {};
+    const packet = {
+        IdType: "",
+        Id: ""
+    };
+
     try {
-        if(data.aep){
+        if ('aep' in data && data.aep && (data.option === 'driver' || data.option == 'employee')) {
             const response = await axios.get(`${process.env.API_URL}/api/AEP/${data.aep}`, {
                 headers: {
                     "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : "",
@@ -55,36 +59,45 @@ const oneqr = asyncHandler(async (req, res) => {
                 }
             });
             responses.aep = response.data;
+            packet.IdType = "AEP";
+            packet.Id = data.aep;
+            if ('adp' in data && data.adp && data.option === 'driver'){
+                const response = await axios.get(`${process.env.API_URL}/api/ADP/getADP/${decode(data.adp)}`, {
+                    headers: {
+                        "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : "",
+                        "sessionData": req.cookies.SESSIONDATA
+                    }
+                });
+                responses.adp = response.data;
+                packet.IdType = "ADP";
+                packet.Id = data.adp;
+            }
+
         }
-        if(data.adp){
-            const response = await axios.get(`${process.env.API_URL}/api/ADP/getADP/${decode(data.adp)}`, {
+    
+
+        if ('avp' in data && data.avp && data.option === 'vehicle') {
+            const avpData = decode(data.avp);
+            const response = await axios.get(`${process.env.API_URL}/api/AVP/${avpData}`, {
                 headers: {
                     "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : "",
                     "sessionData": req.cookies.SESSIONDATA
                 }
             });
-            if(response.data.data.ADP.AEP != responses.aep.data._id){
-                console.log("Contact Airport Admin");
-            }
-            responses.adp = response.data;
+            responses.avp = response.data;
+            packet.IdType = "AVP";
+            packet.Id = data.avp;
         }
 
-        if(data.avp){
-            const response = await axios.get(`${process.env.API_URL}/api/ADP/getADP/${decode(data.adp)}`, {
-                headers: {
-                    "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : "",
-                    "sessionData": req.cookies.SESSIONDATA
-                }
-            });
-            if(response.data.data.ADP.AEP != responses.aep.data._id){
-                throw new ApiError(400,"Error in Data Mapping PM1001");
-            }
-            responses.avp = response.data;
-        }
-        return ApiResponse.success(res, responses, "Data Verified Successfully");
+        packet.Id = decode(packet.Id);
+        const response = await axios.post(`${process.env.API_URL}/api/log/`,packet);
+        return ApiResponse.success(res, {data : responses, log :response.data}, "Data Verified Successfully");
+
     } catch (error) {
-        throw new ApiError(405, error.message);
+        console.error("Error in oneqr function:", error.message || error);
+        throw new ApiError(405, error.message || "Error in data verification");
     }
 });
+
 
 export { qrverify, qrCreate, oneqr };

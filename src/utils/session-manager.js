@@ -2,11 +2,11 @@ import {ApiError} from "./ApiError.js"
 import { asyncHandler } from "./asyncHandler.js";
 import {decode, encode} from "./encode&decode.util.js"
 
-const AddSessionData = (name, data, req) => {
-    if (!req.cookies) {
+const AddSessionData = (name, data, cookie) => {
+    if (!cookie) {
         throw new ApiError(500, "Session Data not found");
     }
-    let sessionData = JSON.parse(decode(req.cookies.SESSIONDATA));
+    let sessionData = JSON.parse(decode(cookie));
     sessionData[name] = data;
     return encode(JSON.stringify(sessionData));
 }
@@ -19,4 +19,11 @@ const GetSessionData =(name, req) => {
     return sessionData[name];
 }
 
-export { AddSessionData, GetSessionData };
+const DecodeCookie = (name, data, req) => {
+    let sessionData = JSON.parse(decode(req));
+    sessionData[name] = data;
+    return encode(JSON.stringify(sessionData));
+}
+
+
+export { AddSessionData, GetSessionData, DecodeCookie };
