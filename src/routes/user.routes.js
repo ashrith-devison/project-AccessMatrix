@@ -13,6 +13,6 @@ const router = Router();
 router.route('/register').post(registerEmployee);
 router.route('/login').post(loginUser);
 router.route('/logout').get(verifyJWT,logoutUser);
-router.route('/change-password').post(verifyJWT,changePassword);
+router.route('/change-password').patch(verifyJWT,changePassword);
 router.route('/forgot-password').post(forgotPassword); // need to check this facility
 export default router;

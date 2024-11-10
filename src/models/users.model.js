@@ -25,10 +25,14 @@ const userSchema = new Schema({
     refreshToken:{
         type: String,
     },
-    loginType : {
-        type : String,
-        enum : ['security','admin'],
-        required : [true,'only Security and Admin Login are allowed'],
+    location:{
+        type: String,
+        required: true,
+    },
+    role:{
+        type: String,
+        enum : ['Admin','Security'],
+        required : [true,'only Admin and Security roles are allowed'],
     },
 },{
     timestamps: true

@@ -29,8 +29,9 @@ const generateAccessAndRefreshToken = async (userId) => {
 }
 
 const registerSecurityEmployee = asyncHandler(async (req,res)=>{
-    const { employeeId, employeeName, email, password, location, role,loginType,AdpAvailable } = req.body;
-    if([employeeId,employeeName,email,password,role,location,loginType].some((field)=>field?.trim() === '')){
+    const { employeeId, employeeName, email, password, location, role} = req.body; //,AdpAvailable 
+    console.log(req.body); // or log the specific fields
+    if([employeeId,employeeName,email,password,role,location].some((field)=>field?.trim() === '')){
         throw new ApiError(400, 'All fields are required');
     }
     const existedUser = await User.findOne(
@@ -44,7 +45,8 @@ const registerSecurityEmployee = asyncHandler(async (req,res)=>{
         employeeName,
         email,
         password,
-        loginType
+        role,
+        location,
     });
     const createdUser = await User.findById(user._id).select(
         "-password -refreshToken"
