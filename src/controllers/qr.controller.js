@@ -8,7 +8,7 @@ import axios from 'axios';
 import moment from 'moment-timezone';
 
 const qrverify = asyncHandler(async (req, res) => {
-    const { id: tokenparam } = req.params;
+    const { id: tokenparam } = req.params; // ENCODED AEP ID
     const token = decode(tokenparam);
     if (!token || token.trim() === '') {
         throw new ApiError(400, "Invalid token");
@@ -30,21 +30,21 @@ const qrverify = asyncHandler(async (req, res) => {
     }
 });
 
-const qrCreate = asyncHandler(async (req, res) => {
-    const { AEP } = req.body;
-    if (!AEP || AEP.trim() === '') throw new ApiError(402, "All fields are Mandatory");
-    try {
-        const AEPData = await AEPs.findById(AEP);
-        if (!AEPData) throw new ApiError(405, "AEP Not Found");
-        const qrtext = encode(AEPData._id);
-        return ApiResponse.success(res, { text: qrtext }, "Code Generated Successfully");
-    } catch (error) {
-        throw new ApiError(405, "Invalid Object Id");
-    }
-});
+// const qrCreate = asyncHandler(async (req, res) => {
+//     const { AEP } = req.body;
+//     if (!AEP || AEP.trim() === '') throw new ApiError(402, "All fields are Mandatory");
+//     try {
+//         const AEPData = await AEPs.findById(AEP);
+//         if (!AEPData) throw new ApiError(405, "AEP Not Found");
+//         const qrtext = encode(AEPData._id);
+//         return ApiResponse.success(res, { text: qrtext }, "Code Generated Successfully");
+//     } catch (error) {
+//         throw new ApiError(405, "Invalid Object Id");
+//     }
+// });
 
 const oneqr = asyncHandler(async (req, res) => {
-    const { data, option } = req.body;
+    const { data, option } = req.body; // {aep: "encoded_aep", adp: "encoded_adp", avp: "encoded_avp", option: "driver/employee/vehicle"}
     let responses = {};
     const packet = {
         IdType: "",
@@ -115,4 +115,4 @@ const oneqr = asyncHandler(async (req, res) => {
 });
 
 
-export { qrverify, qrCreate, oneqr };
+export { qrverify, oneqr };
