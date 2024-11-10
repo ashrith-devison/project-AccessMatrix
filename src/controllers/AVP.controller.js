@@ -5,6 +5,7 @@ import {AVP} from '../models/AVP.model.js';
 import {AEP} from '../models/AEP.model.js';
 import {decode} from '../utils/encode&decode.util.js';
 import {AddSessionData, GetSessionData} from '../utils/session-manager.js';
+import mongoose from 'mongoose';
 
 const createAVP = asyncHandler(async(req,res) => {
     const { AVPId , DateofIssue, AVPValidity, AuthorizedBy, Name, Designation, Organization, Violation } = req.body;
@@ -25,7 +26,7 @@ const createAVP = asyncHandler(async(req,res) => {
     });
 
     return res.
-    json(new ApiResponse(201,{AVP},"Creation of AVP is done"));
+    json(new ApiResponse(201,{avp},"Creation of AVP is done"));
 });
 
 const getAVP = asyncHandler(async(req,res)=>{
@@ -47,23 +48,63 @@ const getAVPs = asyncHandler(async(req,res)=>{
     json(new ApiResponse(200,{AVP : Avps},"Avps fetched successfully"));
 });
 
-const verifyAVP = asyncHandler(async(req, res)=>{
+const updateAVP = asyncHandler(async(req,res)=>{
     const Avpid = req.params.id;
     if(!Avpid){
         throw ApiError.badRequest("AVP ID is required");
     }
-    const avp_temp = decode(Avpid);
-    const AvpDetails = await AVP.findById(avp_temp); 
+    const AvpDetails = await AVP.findById(Avpid); 
     if(!AvpDetails){
         throw new ApiError(402,"AVP is not found at server");
     }
-    const data = await AddSessionData("AVP",AvpDetails,req);
-    return res.cookie('SESSIONDATA', data, { httpOnly: true }).status(200).
-    json({ message: 'AVP Details Fetched Successfully', ADP: adp , AEP: GetSessionData('ADP', req) });
+    const { AVPId , DateofIssue, AVPValidity, AuthorizedBy, Name, Designation, Organization, Violation } = req.body;
+    const avp = await AVP.findByIdAndUpdate(Avpid,{
+        AVPId , 
+        DateofIssue, 
+        AVPValidity, 
+        AuthorizedBy,
+        Name, 
+        Designation, 
+        Organization, 
+        Violation
+    },{new:true});
+
+    return res.status(200).
+    json(new ApiResponse(200,{AVP : avp},"Avp updated successfully"));
 });
+
+const verifyAVP = asyncHandler(async (req, res) => {
+    const AVPid = req.params.id;
+    if (!AVPid) {
+        throw new ApiError(400, 'AVP ID is required');
+    }
+
+    let avp_temp = decode(AVPid);
+    if (!mongoose.Types.ObjectId.isValid(avp_temp)) {
+        throw new ApiError(400, 'Invalid AVP ID format');
+    }
+
+    const avp = await AVP.findById(avp_temp);
+    if (!avp) {
+        throw new ApiError(404, 'AVP not found');
+    }
+
+    // const data = await AddSessionData('AVP', avp, req);
+
+    return res.cookie('SESSIONDATA', avp_temp, { httpOnly: true })
+        .status(200)
+        .json({
+            message: 'AVP Details Fetched Successfully',
+            AVP: avp, 
+            AEP: GetSessionData('AEP', req)
+        });
+});
+
+
 export {
     createAVP,
     getAVP,
     getAVPs,
+    updateAVP,
     verifyAVP
 }
