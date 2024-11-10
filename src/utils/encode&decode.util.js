@@ -1,17 +1,19 @@
 const encode = (str) => {
-    const times = process.env.ENCODE_TIMES;
-    for(let i = 0; i < times; i++) {
-        str = Buffer.from(str).toString('base64');
+    let encodedStr = str;
+    const times = parseInt(process.env.ENCODE_TIMES) || 1; 
+    for (let i = 0; i < times; i++) {
+        encodedStr = Buffer.from(encodedStr).toString('base64');
     }
-    return str;
+    return encodedStr;
 };
 
 const decode = (str) => {
-    const times = process.env.ENCODE_TIMES;
-    for(let i = 0; i < times; i++) {
-        str = Buffer.from(str, 'base64').toString('utf-8');
+    let decodedStr = str;
+    const times = parseInt(process.env.ENCODE_TIMES) || 1;
+    for (let i = 0; i < times; i++) {
+        decodedStr = Buffer.from(decodedStr, 'base64').toString('utf-8');
     }
-    return str;
+    return decodedStr;
 };
 
 export { encode, decode };
