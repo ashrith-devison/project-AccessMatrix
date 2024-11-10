@@ -5,17 +5,23 @@ import {ADP} from '../models/ADP.model.js';
 import {AEP} from '../models/AEP.model.js';
 import {decode} from '../utils/encode&decode.util.js';
 import {AddSessionData, GetSessionData} from '../utils/session-manager.js';
+import mongoose from 'mongoose';
 
 
 const createADP = asyncHandler(async (req, res) => {
+    const { ADPId, DateofIssue, ADPValidity, AuthorizedBy, Name, Designation, Organization, Violation, AEPId, status } = req.body;
     
-    const { ADPId , DateofIssue, ADPValidity, AuthorizedBy, Name, Designation, Organization, Violation,AEPId, status } = req.body;
-    const aep = await AEP.findOne({AEPId});
-    console.log(aep);
+    if ([ADPId, DateofIssue, ADPValidity, AuthorizedBy, Name, Designation, Organization, Violation, AEPId, status].some((field) => String(field).trim() === '')) {
+        throw new ApiError(400, 'All fields are required');
+    }
+    
+    //const aep = await AEP.findOne({ AEPId });
+    const aep = await AEP.findOne({ _id: new mongoose.Types.ObjectId(AEPId) });
+
     if (!aep) {
         throw new ApiError(404, 'AEP not found');
     }
-    
+
     const adp = await ADP.create({
         ADPId,
         DateofIssue,
@@ -28,14 +34,12 @@ const createADP = asyncHandler(async (req, res) => {
         AEP: aep._id,
         status
     });
-    
-    
 
     return res
-    .status(201)
-    .json(new ApiResponse(201, {ADP}, 'ADP created successfully'));
-
+        .status(201)
+        .json(new ApiResponse(201, 'ADP created successfully', { ADP: adp }));
 });
+
 
 const getADPs = asyncHandler(async (req, res) => {
     const adps = await ADP.find();
@@ -44,7 +48,7 @@ const getADPs = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {ADPs: adps}, 'ADPs retrieved successfully'));
 });
 
-const getADP = asyncHandler(async (req, res) => {
+const getADPbyId = asyncHandler(async (req, res) => {
     const adp = await ADP.findById(req.params.id);
     if (!adp) {
         throw new ApiError(404, 'ADP not found');
@@ -100,21 +104,28 @@ const verifyADP = asyncHandler(async (req, res) => {
     if (!ADPId) {
         throw new ApiError(400, 'ADP ID is required');
     }
-    let adp_temp = decode(ADPId);
+
+    let adp_temp = decode(ADPId); // Assuming decode returns the ADPId in proper format
+
+    // Validate the decoded ADPId to ensure it's a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(adp_temp)) {
+        throw new ApiError(400, 'Invalid ADP ID format');
+    }
+
     const adp = await ADP.findById(adp_temp);
     if (!adp) {
         throw new ApiError(404, 'ADP not found');
     }
-    // const data = await AddSessionData('ADP', adp, req);
+
     return res.cookie('SESSIONDATA', adp_temp, { httpOnly: true }).status(200).
-    json({ message: 'ADP Details Fetched Successfully', ADP: adp , AEP: GetSessionData('AEP', req) });
+    json({ message: 'ADP Details Fetched Successfully', ADP: adp, AEP: GetSessionData('AEP', req) });
 });
 
 
 export {
     createADP,
     getADPs,
-    getADP,
+    getADPbyId,
     updateADP,
     deleteADP,
     verifyADP
