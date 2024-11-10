@@ -41,6 +41,12 @@ const getAVP = asyncHandler(async(req,res)=>{
     json(new ApiResponse(200,{AVP : AvpDetails},"Avps fetched successfully"));
 });
 
+const getAVPs = asyncHandler(async(req,res)=>{
+    const Avps = await AVP.find();
+    return res.status(200).
+    json(new ApiResponse(200,{AVP : Avps},"Avps fetched successfully"));
+});
+
 const verifyAVP = asyncHandler(async(req, res)=>{
     const Avpid = req.params.id;
     if(!Avpid){
@@ -58,5 +64,6 @@ const verifyAVP = asyncHandler(async(req, res)=>{
 export {
     createAVP,
     getAVP,
+    getAVPs,
     verifyAVP
 }
