@@ -15,8 +15,11 @@ const createADP = asyncHandler(async (req, res) => {
         throw new ApiError(400, 'All fields are required');
     }
     
-    //const aep = await AEP.findOne({ AEPId });
-    const aep = await AEP.findOne({ _id: new mongoose.Types.ObjectId(AEPId) });
+    const adpExists = await ADP.findOne({ ADPId : ADPId });
+    if (adpExists) {
+        throw new ApiError(400, 'ADP already exists');
+    }
+    const aep = await AEP.findOne({ AEPId: AEPId });
 
     if (!aep) {
         throw new ApiError(404, 'AEP not found');
@@ -50,6 +53,7 @@ const getADPs = asyncHandler(async (req, res) => {
 
 const getADPbyId = asyncHandler(async (req, res) => {
     const adp = await ADP.findById(req.params.id);
+    console.log(adp)
     if (!adp) {
         throw new ApiError(404, 'ADP not found');
     }

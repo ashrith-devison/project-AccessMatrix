@@ -10,12 +10,14 @@ import moment from 'moment-timezone';
 const qrverify = asyncHandler(async (req, res) => {
     const { id: tokenparam } = req.params; // ENCODED AEP ID
     const token = decode(tokenparam);
+    console.log(token);
     if (!token || token.trim() === '') {
         throw new ApiError(400, "Invalid token");
     }
     try {
         const AEPData = await AEPs.findById(token);
         if (!AEPData) throw new ApiError(405, "AEP Not Found");
+
         if (!req.cookies.SESSIONDATA && req.headers.sessiondata) {
             const cookie = req.headers.sessiondata;
             const data = await DecodeCookie("AEP", AEPData, cookie);
@@ -50,10 +52,9 @@ const oneqr = asyncHandler(async (req, res) => {
         IdType: "",
         Id: ""
     };
-
     try {
         const currentDateIST = moment().tz("Asia/Kolkata").toDate();
-        if ('aep' in data && data.aep && (data.option === 'driver' || data.option == 'employee')) {
+        if ('aep' in data && data.aep && (data.option === 'driver' || data.option === 'employee')) {
             const response = await axios.get(`${process.env.API_URL}/api/AEP/${data.aep}`, {
                 headers: {
                     "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : "",
@@ -63,13 +64,13 @@ const oneqr = asyncHandler(async (req, res) => {
             responses.aep = response.data;
             packet.IdType = "AEP";
             packet.Id = data.aep;
-
             if(new Date(response.data.DateofExpiry) < currentDateIST){
                 return ApiResponse.error(res, "AEP Expired", 405);
             }
 
             if ('adp' in data && data.adp && data.option === 'driver'){
-                const response = await axios.get(`${process.env.API_URL}/api/ADP/getADP/${decode(data.adp)}`, {
+                const adp_temp = decode(data.adp)
+                const response = await axios.get(`${process.env.API_URL}/api/ADP/${adp_temp}`, {
                     headers: {
                         "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : "",
                         "sessionData": req.cookies.SESSIONDATA
@@ -78,6 +79,7 @@ const oneqr = asyncHandler(async (req, res) => {
                 responses.adp = response.data;
                 packet.IdType = "ADP";
                 packet.Id = data.adp;
+                console.log(responses)
 
                 if(new Date(response.data.ADPValidity) < currentDateIST){
                     return ApiResponse.error(res, "ADP Expired", 405);
@@ -85,7 +87,6 @@ const oneqr = asyncHandler(async (req, res) => {
             }
 
         }
-        
 
         if ('avp' in data && data.avp && data.option === 'vehicle') {
             const avpData = decode(data.avp);
@@ -106,7 +107,7 @@ const oneqr = asyncHandler(async (req, res) => {
 
         packet.Id = decode(packet.Id);
         const response = await axios.post(`${process.env.API_URL}/api/log/`,packet);
-        return ApiResponse.success(res, {data : responses, log :response.data}, "Data Verified Successfully");
+        return ApiResponse.success(res, {data : responses, logs : response.data}, "Data Verified Successfully");
 
     } catch (error) {
         console.error("Error in oneqr function:", error.message || error);

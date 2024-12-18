@@ -5,7 +5,8 @@ import {
     loginUser,
     logoutUser,
     changePassword,
-    forgotPassword
+    forgotPassword,
+    getAllEmployeeDetails
 } from '../controllers/User.controller.js';
 
 const router = Router();
@@ -15,4 +16,5 @@ router.route('/login').post(loginUser);
 router.route('/logout').get(verifyJWT,logoutUser);
 router.route('/change-password').patch(verifyJWT,changePassword);
 router.route('/forgot-password').post(forgotPassword); // need to check this facility
+router.route('/employees/all').get(getAllEmployeeDetails);
 export default router;

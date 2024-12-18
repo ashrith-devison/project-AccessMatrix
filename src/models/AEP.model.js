@@ -6,9 +6,12 @@ const AEPschema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    EmployeeName : {
+        type: String,
+        required: true
+    },
     Locations : {
         type: [String],
-        enum: ['ATC', 'Main', 'CNS'],
         required: true
     },
     DateofIssue : {
@@ -25,7 +28,6 @@ const AEPschema = new mongoose.Schema({
     },
     status : {
         type: String,
-        enum: ['Active', 'Inactive','Block'],
         required: true
     },
     AdpAvailable : {

@@ -38,9 +38,8 @@ const updateExitEntryOneTime = async (req, res) => {
 
 const createEntry = async (req, res) => {
     const { IdType, Id } = req.body;
-
     if ([IdType, Id].some((field) => field?.trim() === '')) {
-        throw new ApiError.forbidden("All Id are required");
+        throw ApiError.forbidden("All Id are required");
     }
 
     const exitUpdateResponse = await updateExitEntry(IdType, Id);

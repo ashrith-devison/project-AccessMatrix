@@ -12,10 +12,7 @@ import logbook from "./routes/LogBook.routes.js";
 
 const app = express();
 app.use(
-    cors({
-        origin: process.env.CLIENT_URL, // allow to server to accept request from different origin
-        credentials: true,
-    })
+    cors()
 )
 
 app.use(express.json(
@@ -39,8 +36,7 @@ app.use((req, res, next) => {
         sameSite : 'Strict'
     });
     next();
-});
-
+})
 
 app.get('/',(req,res)=>{
     res.send("<h1>Backend Server is Initiated</h1>");

@@ -38,6 +38,7 @@ const registerSecurityEmployee = asyncHandler(async (req,res)=>{
         { $or: [{email}, {employeeId}]}
     );
     if(existedUser){
+        console.log(existedUser);
         throw new ApiError(400, 'Employee already exists');
     }
     const user = await User.create({
@@ -134,5 +135,36 @@ const forgotPassword = asyncHandler(async(req,res)=>{
     const resetToken = user.generatePasswordResetToken();
     // need to complete this code
  })
+ import { AEP } from "../models/AEP.model.js";
+ import { ADP } from "../models/ADP.model.js";
+ import { AVP } from "../models/AVP.model.js";
+ 
+ const getAllEmployeeDetails = asyncHandler(async (req, res) => {
+   const users = await User.find();
+ 
+   const aeps = await AEP.aggregate([
+     {
+       $lookup: {
+         from: "adps",
+         localField: "_id",
+         foreignField: "AEP",
+         as: "ADP"
+       }
+     },
+   ]);
+ 
+   res.status(200).json({
+     statusCode: 200,
+     data: {
+       users,
+       aeps,
+       avps: await AVP.find()
+     },
+     message: "All employees fetched successfully",
+     success: true
+   });
+ });
 
-export { registerSecurityEmployee, loginUser, logoutUser,changePassword,forgotPassword }
+export { registerSecurityEmployee, loginUser, logoutUser,changePassword,forgotPassword,
+    getAllEmployeeDetails
+ }

@@ -29,7 +29,6 @@ const ADPschema = new mongoose.Schema({
     },
     Organization:{
         type: String,
-        required: true
     },
     Violation:{
         type: [String], // This should be an array of strings

@@ -32,7 +32,6 @@ const AVPschema = new mongoose.Schema({
     },
     Violation:{
         type: [String], // This should be an array of strings
-        required: true
     },
 },{timestamps: true});
 
