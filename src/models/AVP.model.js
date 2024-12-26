@@ -33,6 +33,11 @@ const AVPschema = new mongoose.Schema({
     Violation:{
         type: [String], // This should be an array of strings
     },
+    status: {
+        type: String,
+        enum: ['ACTIVE', 'Inactive', 'BLOCKED'],
+        required: true
+    },
 },{timestamps: true});
 
 export const AVP = mongoose.model('AVP', AVPschema);

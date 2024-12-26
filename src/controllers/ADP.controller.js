@@ -142,6 +142,31 @@ const renewADP = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, { ADP: updatedADP }, "ADP renewed successfully"))
 });
 
+const blockADP = asyncHandler(async (req, res) => {
+    const adp = await ADP.findOne({ ADPId: req.params.id });
+    if (!adp) {
+        throw new ApiError(404, 'ADP not found');
+    }
+    const updatedADP = await ADP.findByIdAndUpdate(adp._id, { status: 'BLOCKED' }, { new: true });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { ADP: updatedADP }, "ADP blocked successfully"));
+    }
+);
+
+
+const unblockADP = asyncHandler(async (req, res) => {
+    const adp = await ADP.findOne({ ADPId: req.params.id });
+    if (!adp) {
+        throw new ApiError(404, 'ADP not found');
+    }
+    const updatedADP = await ADP.findByIdAndUpdate(adp._id, { status: 'ACTIVE' }, { new: true });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { ADP: updatedADP }, "ADP unblocked successfully"));
+    }
+);
+
 export {
     createADP,
     getADPs,
@@ -149,5 +174,7 @@ export {
     updateADP,
     deleteADP,
     verifyADP,
-    renewADP
+    renewADP,
+    blockADP,
+    unblockADP
 }

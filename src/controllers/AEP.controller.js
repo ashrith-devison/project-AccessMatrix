@@ -135,17 +135,40 @@ const fetchAdpByAEP = asyncHandler(async (req, res) => {
     ]);
 
     if (aeps.length === 0) {
-        throw new ApiError(404, 'AEP not found');
+        throw new ApiError(502, 'AEP not found');
     }
 
     if (aeps[0]?.ADP.length >= 2) {
-        throw new ApiError(404, 'Multiples ADP available for this AEP .. contact admin ....');
+        return ApiResponse.error(res, 'Multiples ADP available for this AEP .. contact admin ....',400);
     }
 
     return res
         .status(200)
         .json(new ApiResponse(200, { AEPs: aeps }, "AEP and ADP retrieved successfully"))
 });
+
+const blockAEP = asyncHandler(async (req, res) => {
+    const aep = await AEP.findOne({ AEPId: req.params.id });
+    if (!aep) {
+        throw new ApiError(404, 'AEP not found');
+    }
+    const updatedAEP = await AEP.findByIdAndUpdate(aep._id, { status: 'BLOCKED' }, { new: true });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { AEP: updatedAEP }, "AEP blocked successfully"))
+});
+
+const unblockAEP = asyncHandler(async (req, res) => {
+    const aep = await AEP.findOne({ AEPId: req.params.id });
+    if (!aep) {
+        throw new ApiError(404, 'AEP not found');
+    }
+    const updatedAEP = await AEP.findByIdAndUpdate(aep._id, { status: 'ACTIVE' }, { new: true });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { AEP: updatedAEP }, "AEP unblocked successfully"))
+    }
+);
 
 export  {
     createAEP,
@@ -154,5 +177,7 @@ export  {
     updateAEP,
     deleteAEP,
     fetchAdpByAEP,
-    renewAEP
+    renewAEP,
+    blockAEP,
+    unblockAEP
 }

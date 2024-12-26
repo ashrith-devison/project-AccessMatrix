@@ -41,7 +41,7 @@ const ADPschema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Active', 'Inactive', 'Block'],
+        enum: ['ACTIVE', 'Inactive', 'BLOCKED'],
         required: true
     },
 },{timestamps: true});

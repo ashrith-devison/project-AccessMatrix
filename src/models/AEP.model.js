@@ -28,6 +28,7 @@ const AEPschema = new mongoose.Schema({
     },
     status : {
         type: String,
+        enum: ['ACTIVE', 'Inactive', 'BLOCKED'],
         required: true
     },
     AdpAvailable : {

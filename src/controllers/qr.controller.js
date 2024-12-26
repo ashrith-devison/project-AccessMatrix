@@ -64,8 +64,11 @@ const oneqr = asyncHandler(async (req, res) => {
             responses.aep = response.data;
             packet.IdType = "AEP";
             packet.Id = data.aep;
-            if(new Date(response.data.DateofExpiry) < currentDateIST){
+            if(new Date(response.data.data.DateofExpiry) < currentDateIST){
                 return ApiResponse.error(res, "AEP Expired", 405);
+            }
+            if(response.data.data.status === "BLOCKED"){
+                return ApiResponse.error(res, "AEP is Blocked", 405);
             }
 
             if ('adp' in data && data.adp && data.option === 'driver'){
@@ -81,8 +84,11 @@ const oneqr = asyncHandler(async (req, res) => {
                 packet.Id = data.adp;
                 console.log(responses)
 
-                if(new Date(response.data.ADPValidity) < currentDateIST){
+                if(new Date(response.data.data.ADP.ADPValidity) < currentDateIST){
                     return ApiResponse.error(res, "ADP Expired", 405);
+                }
+                if(response.data.data.ADP.status === "BLOCKED"){
+                    return ApiResponse.error(res, "ADP is Blocked", 405);
                 }
             }
 
@@ -90,7 +96,7 @@ const oneqr = asyncHandler(async (req, res) => {
 
         if ('avp' in data && data.avp && data.option === 'vehicle') {
             const avpData = decode(data.avp);
-            const response = await axios.get(`${process.env.API_URL}/api/AVP/${avpData}`, {
+            const response = await axios.get(`${process.env.API_URL}/api/AVP/id/${avpData}`, {
                 headers: {
                     "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : "",
                     "sessionData": req.cookies.SESSIONDATA
@@ -100,8 +106,11 @@ const oneqr = asyncHandler(async (req, res) => {
             packet.IdType = "AVP";
             packet.Id = data.avp;
 
-            if(new Date(response.data.AVPValidity) < currentDateIST){
+            if(new Date(response.data.data.AVP.AVPValidity) < currentDateIST){
                 return ApiResponse.error(res, "AVP Expired", 405);
+            }
+            if(response.data.data.AVP.status === "BLOCKED"){
+                return ApiResponse.error(res, "AVP is Blocked", 405);
             }
         }
 

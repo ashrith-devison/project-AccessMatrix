@@ -42,6 +42,19 @@ const getAVP = asyncHandler(async(req,res)=>{
     json(new ApiResponse(200,{AVP : AvpDetails},"Avps fetched successfully"));
 });
 
+const getAVPById = asyncHandler(async(req,res)=>{
+    const Avpid = req.params.id;
+    if(!Avpid){
+        throw ApiError.badRequest("AVP ID is required");
+    }
+    const AvpDetails = await AVP.findById(Avpid); 
+    if(!AvpDetails){
+        throw new ApiError(402,"AVP is not found at server");
+    }
+    return res.status(200).
+    json(new ApiResponse(200,{AVP : AvpDetails},"Avps fetched successfully"));
+});
+
 const getAVPs = asyncHandler(async(req,res)=>{
     const Avps = await AVP.find();
     return res.status(200).
@@ -120,6 +133,38 @@ const renewAVP = asyncHandler(async(req,res)=>{
 }
 );
 
+const blockAVP = asyncHandler(async(req,res)=>{
+    const Avpid = req.params.id;
+    if(!Avpid){
+        throw ApiError.badRequest("AVP ID is required");
+    }
+    const AvpDetails = await AVP.findOne({AVPId : Avpid}); 
+    if(!AvpDetails){
+        throw new ApiError(402,"AVP is not found at server");
+    }
+    const updatedAVP = await AVP.findByIdAndUpdate(AvpDetails._id, { status: "Blocked" }, { new: true });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { AVP: updatedAVP,  }, "AVP Blocked successfully"))
+    }
+);
+
+const unblockAVP = asyncHandler(async(req,res)=>{
+    const Avpid = req.params.id;
+    if(!Avpid){
+        throw ApiError.badRequest("AVP ID is required");
+    }
+    const AvpDetails = await AVP.findOne({AVPId : Avpid}); 
+    if(!AvpDetails){
+        throw new ApiError(402,"AVP is not found at server");
+    }
+    const updatedAVP = await AVP.findByIdAndUpdate(AvpDetails._id, { status: "ACTIVE" }, { new: true });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { AVP: updatedAVP,  }, "AVP Unblocked successfully"))
+    }
+);
+
 
 export {
     createAVP,
@@ -127,5 +172,8 @@ export {
     getAVPs,
     updateAVP,
     verifyAVP,
-    renewAVP
+    renewAVP,
+    getAVPById,
+    blockAVP,
+    unblockAVP
 }
