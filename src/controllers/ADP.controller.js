@@ -127,6 +127,20 @@ const verifyADP = asyncHandler(async (req, res) => {
     json({ message: 'ADP Details Fetched Successfully', ADP: adp, AEP: GetSessionData('AEP', req) });
 });
 
+const renewADP = asyncHandler(async (req, res) => {
+    const adp = await ADP.findOne({ ADPId: req.params.id });
+    if (!adp) {
+        throw new ApiError(404, 'ADP not found');
+    }
+    const { ADPValidity, DateofIssue } = req.body;
+    if (!ADPValidity) {
+        throw new ApiError(400, 'ADPValidity is required');
+    }
+    const updatedADP = await ADP.findByIdAndUpdate(adp._id, { ADPValidity, DateofIssue }, { new: true });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { ADP: updatedADP }, "ADP renewed successfully"))
+});
 
 export {
     createADP,
@@ -134,5 +148,6 @@ export {
     getADPbyId,
     updateADP,
     deleteADP,
-    verifyADP
+    verifyADP,
+    renewADP
 }

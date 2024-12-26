@@ -34,7 +34,7 @@ const getAVP = asyncHandler(async(req,res)=>{
     if(!Avpid){
         throw ApiError.badRequest("AVP ID is required");
     }
-    const AvpDetails = await AVP.findById(Avpid); 
+    const AvpDetails = await AVP.findOne({AVPId : Avpid}); 
     if(!AvpDetails){
         throw new ApiError(402,"AVP is not found at server");
     }
@@ -100,11 +100,32 @@ const verifyAVP = asyncHandler(async (req, res) => {
         });
 });
 
+const renewAVP = asyncHandler(async(req,res)=>{
+    const Avpid = req.params.id;
+    if(!Avpid){
+        throw ApiError.badRequest("AVP ID is required");
+    }
+    const AvpDetails = await AVP.findOne({AVPId : Avpid}); 
+    if(!AvpDetails){
+        throw new ApiError(402,"AVP is not found at server");
+    }
+    const { AVPValidity, DateofIssue } = req.body;
+    if (!AVPValidity) {
+        throw new ApiError(400, 'DateofExpiry is required');
+    }
+    const updatedAVP = await AVP.findByIdAndUpdate(AvpDetails._id, { AVPValidity, DateofIssue }, { new: true });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { AVP: updatedAVP,  }, "AVP renewed successfully"))
+}
+);
+
 
 export {
     createAVP,
     getAVP,
     getAVPs,
     updateAVP,
-    verifyAVP
+    verifyAVP,
+    renewAVP
 }

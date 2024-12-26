@@ -5,7 +5,8 @@ import {
     getAEPs,
     updateAEP,
     deleteAEP,
-    fetchAdpByAEP
+    fetchAdpByAEP,
+    renewAEP
 } from '../controllers/AEP.controller.js';
 
 
@@ -13,6 +14,7 @@ const router = Router();
 
 router.route('/').post(createAEP).get(getAEPs);
 router.route('/:id').get(getAEP).patch(updateAEP).delete(deleteAEP);
-router.route('/adp/:id').get(fetchAdpByAEP);
+router.route('/getADPs/:id').get(fetchAdpByAEP);
+router.route('/renew/:id').post(renewAEP);
 
 export default router;

@@ -46,7 +46,7 @@ const getAEP = asyncHandler(async (req, res) => {
 })
 
 const updateAEP = asyncHandler(async (req, res) => {
-    const aep = await AEP.findById(req.params.id);
+    const aep = await AEP.findOne({ AEPId: req.params.id });
     if (!aep) {
         throw new ApiError(404, 'AEP not found');
     }
@@ -54,7 +54,7 @@ const updateAEP = asyncHandler(async (req, res) => {
     if ([AEPId, Locations, DateofIssue, DateofExpiry, IssuedBy, status, EmployeeName].some((field) => String(field)?.trim() === '')) {
         throw new ApiError(400, 'All fields are required');
     }
-    const updatedAEP = await AEP.findByIdAndUpdate(req.params.id, {
+    const updatedAEP = await AEP.findByIdAndUpdate(aep._id, {
         AEPId,
         Locations,
         DateofIssue,
@@ -66,7 +66,22 @@ const updateAEP = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(new ApiResponse(200, { AEP: updatedAEP }, "AEP updated successfully"))
-})
+});
+
+const renewAEP = asyncHandler(async (req, res) => {
+    const aep = await AEP.findOne({ AEPId: req.params.id });
+    if (!aep) {
+        throw new ApiError(404, 'AEP not found');
+    }
+    const { DateofExpiry, DateofIssue } = req.body;
+    if (!DateofExpiry) {
+        throw new ApiError(400, 'DateofExpiry is required');
+    }
+    const updatedAEP = await AEP.findByIdAndUpdate(aep._id, { DateofExpiry, DateofIssue }, { new: true });
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { AEP: updatedAEP }, "AEP renewed successfully"))
+});
 
 const deleteAEP = asyncHandler(async (req, res) => {
     const aep = await AEP.findById(req.params.id);
@@ -138,5 +153,6 @@ export  {
     getAEP,
     updateAEP,
     deleteAEP,
-    fetchAdpByAEP
+    fetchAdpByAEP,
+    renewAEP
 }
