@@ -38,6 +38,15 @@ const AVPschema = new mongoose.Schema({
         enum: ['ACTIVE', 'Inactive', 'BLOCKED'],
         required: true
     },
+    VehicleNo : {
+        type: String,
+        required: true
+    },
+    VehicleType : {
+        type: String,
+        enum : ['Two Wheeler', 'Four Wheeler', 'Heavy Vehicle'],
+        required: true
+    },
 },{timestamps: true});
 
 export const AVP = mongoose.model('AVP', AVPschema);

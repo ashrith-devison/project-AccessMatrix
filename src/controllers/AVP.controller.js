@@ -8,7 +8,10 @@ import {AddSessionData, GetSessionData} from '../utils/session-manager.js';
 import mongoose from 'mongoose';
 
 const createAVP = asyncHandler(async(req,res) => {
-    const { AVPId , DateofIssue, AVPValidity, AuthorizedBy, Name, Designation, Organization, Violation, status } = req.body;
+    const { AVPId , DateofIssue, AVPValidity, AuthorizedBy, Name, 
+        Designation, Organization, Violation, status,
+        VehicleNo, VehicleType
+     } = req.body;
     const avp_check = await AVP.findOne({AVPId : AVPId});
     console.log(avp_check);
     if(avp_check != null) {
@@ -23,7 +26,9 @@ const createAVP = asyncHandler(async(req,res) => {
         Designation, 
         Organization, 
         Violation,
-        status
+        status,
+        VehicleNo,
+        VehicleType
     });
 
     return res.
