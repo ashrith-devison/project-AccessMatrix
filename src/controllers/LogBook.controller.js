@@ -37,7 +37,7 @@ const updateExitEntryOneTime = async (req, res) => {
 };
 
 const createEntry = async (req, res) => {
-    const { IdType, Id } = req.body;
+    const { IdType, Id, location } = req.body;
     if ([IdType, Id].some((field) => field?.trim() === '')) {
         throw ApiError.forbidden("All Id are required");
     }
@@ -45,7 +45,7 @@ const createEntry = async (req, res) => {
     const exitUpdateResponse = await updateExitEntry(IdType, Id);
     if (exitUpdateResponse.success === 'true') 
         return ApiResponse.success(res, exitUpdateResponse,"Exit Time Updated Successfully");
-    const log = await logRecord.create({ validatedId: IdType, Id });
+    const log = await logRecord.create({ validatedId: IdType, Id, location });
     return ApiResponse.success(res, log, "Entry created successfully");
 };
 

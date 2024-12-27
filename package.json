@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "nodemon index.js",
     "prod": "vercel --prod",
-    "build": "nexe src/index.js -o dist/app.exe --build --target node22-win-x64"
+    "build": "nexe -i ./src/index.js -o my-app --build --false --verbose"
   },
   "author": "",
   "license": "ISC",
@@ -26,8 +26,7 @@
     "mongoose": "^8.5.2",
     "mongoose-aggregate-paginate-v2": "^1.1.2",
     "prettier": "^3.3.3",
-    "vercel": "^37.11.0",
-    "zonalentry": "file:"
+    "vercel": "^37.11.0"
   },
   "devDependencies": {
     "nexe": "^4.0.0-rc.6",

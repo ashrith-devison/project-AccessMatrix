@@ -56,7 +56,8 @@ userSchema.methods.generateAccessToken = function(){
         {_id : this._id,
         email : this.email,
         employeeId : this.employeeId,
-        employeeName : this.employeeName, },
+        employeeName : this.employeeName,
+        role : this.role,},
         process.env.ACCESS_TOKEN_SECRET,
         {
             expiresIn: process.env.ACCESS_TOKEN_LIFE
@@ -67,6 +68,10 @@ userSchema.methods.generateAccessToken = function(){
 userSchema.methods.generateRefreshToken = function(){
     return jwt.sign(
         {_id : this._id,
+            email : this.email,
+            employeeId : this.employeeId,
+            employeeName : this.employeeName,
+            role : this.role,
          },
         process.env.REFRESH_TOKEN_SECRET,
         {
