@@ -46,7 +46,7 @@ const qrverify = asyncHandler(async (req, res) => {
 // });
 
 const oneqr = asyncHandler(async (req, res) => {
-    const { data, option } = req.body; // {aep: "encoded_aep", adp: "encoded_adp", avp: "encoded_avp", option: "driver/employee/vehicle"}
+    const { data } = req.body; // {aep: "encoded_aep", adp: "encoded_adp", avp: "encoded_avp", option: "driver/employee/vehicle"}
     let responses = {};
     const packet = {
         IdType: "",
@@ -69,6 +69,9 @@ const oneqr = asyncHandler(async (req, res) => {
             }
             if(response.data.data.status === "BLOCKED"){
                 return ApiResponse.error(res, "AEP is Blocked", 405);
+            }
+            if(!response.data.data.Locations.includes(data.location) || !response.data.data.Roles.includes("ALL")){
+                return ApiResponse.error(res, "Access Denied", 405);
             }
 
             if ('adp' in data && data.adp && data.option === 'driver'){

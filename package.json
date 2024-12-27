@@ -9,7 +9,8 @@
     "start": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "nodemon index.js",
-    "prod": "vercel --prod"
+    "prod": "vercel --prod",
+    "build": "nexe src/index.js -o dist/app.exe --build --target node22-win-x64"
   },
   "author": "",
   "license": "ISC",
@@ -29,6 +30,7 @@
     "zonalentry": "file:"
   },
   "devDependencies": {
+    "nexe": "^4.0.0-rc.6",
     "nodemon": "^3.1.4"
   }
 }
