@@ -70,7 +70,7 @@ const oneqr = asyncHandler(async (req, res) => {
             if(response.data.data.status === "BLOCKED"){
                 return ApiResponse.error(res, "AEP is Blocked", 405);
             }
-            if(!response.data.data.Locations.includes(data.location) || !response.data.data.Roles.includes("ALL")){
+            if(!response.data.data.Locations.includes(data.location)){
                 return ApiResponse.error(res, "Access Denied", 405);
             }
 
@@ -118,6 +118,7 @@ const oneqr = asyncHandler(async (req, res) => {
         }
 
         packet.Id = decode(packet.Id);
+        packet.location = data.location;
         const response = await axios.post(`${process.env.API_URL}/api/log/`,packet);
         return ApiResponse.success(res, {data : responses, logs : response.data}, "Data Verified Successfully");
 
