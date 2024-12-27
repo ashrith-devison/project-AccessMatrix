@@ -119,7 +119,12 @@ const oneqr = asyncHandler(async (req, res) => {
 
         packet.Id = decode(packet.Id);
         packet.location = data.location;
-        const response = await axios.post(`${process.env.API_URL}/api/log/`,packet);
+        const response = await axios.post(`${process.env.API_URL}/api/log/`,packet, {
+            headers: {
+                "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : "",
+                "sessionData": req.cookies.SESSIONDATA
+            }
+        });
         return ApiResponse.success(res, {data : responses, logs : response.data}, "Data Verified Successfully");
 
     } catch (error) {

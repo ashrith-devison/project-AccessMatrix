@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 const adminMiddleware = asyncHandler(async (req, res, next) => {
     const token = req.cookies?.accessToken || req.headers['authorization']?.replace('Bearer ', '');
     if (!token) {
+        console.log("No token found");
         throw new ApiError(401, "Unauthorized");
     }
     try {

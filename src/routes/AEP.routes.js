@@ -13,12 +13,13 @@ import {
 
 
 const router = Router();
+import {adminMiddleware, securityMiddleware} from '../middlewares/admin.middleware.js';
 
-router.route('/').post(createAEP).get(getAEPs);
-router.route('/:id').get(getAEP).patch(updateAEP).delete(deleteAEP);
-router.route('/getADPs/:id').get(fetchAdpByAEP);
-router.route('/renew/:id').post(renewAEP);
-router.route('/block/:id').get(blockAEP);
-router.route('/unblock/:id').get(unblockAEP);
+router.route('/').post(adminMiddleware,createAEP).get(getAEPs);
+router.route('/:id').get(securityMiddleware,getAEP).patch(updateAEP).delete(deleteAEP);
+router.route('/getADPs/:id').get(adminMiddleware,fetchAdpByAEP);
+router.route('/renew/:id').post(adminMiddleware,renewAEP);
+router.route('/block/:id').get(adminMiddleware,blockAEP);
+router.route('/unblock/:id').get(adminMiddleware,unblockAEP);
 
 export default router;

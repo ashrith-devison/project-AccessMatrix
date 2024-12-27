@@ -10,11 +10,12 @@ import {
 } from '../controllers/User.controller.js';
 
 const router = Router();
+import {adminMiddleware, securityMiddleware} from '../middlewares/admin.middleware.js';
 
-router.route('/register').post(registerEmployee);
+router.route('/register').post(adminMiddleware,registerEmployee);
 router.route('/login').post(loginUser);
 router.route('/logout').get(verifyJWT,logoutUser);
 router.route('/change-password').patch(verifyJWT,changePassword);
 router.route('/forgot-password').post(forgotPassword); // need to check this facility
-router.route('/employees/all').get(getAllEmployeeDetails);
+router.route('/employees/all').get(adminMiddleware,getAllEmployeeDetails);
 export default router;
