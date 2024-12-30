@@ -17,14 +17,7 @@ const qrverify = asyncHandler(async (req, res) => {
     try {
         const AEPData = await AEPs.findById(token);
         if (!AEPData) throw new ApiError(405, "AEP Not Found");
-
-        if (!req.cookies.SESSIONDATA && req.headers.sessiondata) {
-            const cookie = req.headers.sessiondata;
-            const data = await DecodeCookie("AEP", AEPData, cookie);
-            return res.cookie('SESSIONDATA', AEPData, { httpOnly: true }).status(200).json({ message: "AEP Details Fetched Successfully", data: AEPData });
-        }
-        const data = await AddSessionData("AEP", AEPData, req.cookies.SESSIONDATA);
-        return res.cookie('SESSIONDATA', data, { httpOnly: true }).status(200).json({ message: "AEP Details Fetched Successfully", data: AEPData });
+        return res.status(200).json({ message: "AEP Details Fetched Successfully", data: AEPData });
 
     } catch (error) {
         const errorMessage = error.message || "An unexpected error occurred";
@@ -57,7 +50,7 @@ const oneqr = asyncHandler(async (req, res) => {
         if ('aep' in data && data.aep && (data.option === 'driver' || data.option === 'employee')) {
             const response = await axios.get(`${process.env.API_URL}/api/AEP/${data.aep}`, {
                 headers: {
-                    "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : "",
+                    "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : req.headers.authorization ,
                     "sessionData": req.cookies.SESSIONDATA
                 }
             });
@@ -75,10 +68,14 @@ const oneqr = asyncHandler(async (req, res) => {
             }
 
             if ('adp' in data && data.adp && data.option === 'driver'){
-                const adp_temp = decode(data.adp)
+                const adp_temp = decode(data.adp);
+                const headers = {
+                    "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : req.headers.authorization,
+                    "sessionData": req.cookies.SESSIONDATA
+                };
                 const response = await axios.get(`${process.env.API_URL}/api/ADP/${adp_temp}`, {
                     headers: {
-                        "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : "",
+                        "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : req.headers.authorization,
                         "sessionData": req.cookies.SESSIONDATA
                     }
                 });
@@ -101,7 +98,7 @@ const oneqr = asyncHandler(async (req, res) => {
             const avpData = decode(data.avp);
             const response = await axios.get(`${process.env.API_URL}/api/AVP/id/${avpData}`, {
                 headers: {
-                    "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : "",
+                    "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : req.headers.authorization,
                     "sessionData": req.cookies.SESSIONDATA
                 }
             });

@@ -6,23 +6,24 @@ const adminMiddleware = asyncHandler(async (req, res, next) => {
     const token = req.cookies?.accessToken || req.headers['authorization']?.replace('Bearer ', '');
     if (!token) {
         console.log("No token found");
-        throw new ApiError(401, "Unauthorized");
+        throw new ApiError(401, "Unauthorized -- Token Not Found");
     }
     try {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
         if (decoded.role !== "Admin") {
-            throw new ApiError(401, "Unauthorized");
+            throw new ApiError(401, "Unauthorized -- Admin Login Required ...");
         }
         next();
     } catch (error) {
-        throw new ApiError(401, "Unauthorized");
+        throw new ApiError(401, "Unauthorized -- "+error.message);
     }
 });
 
 const securityMiddleware = asyncHandler(async (req, res, next) => {
     const token = req.cookies?.accessToken || req.headers['authorization']?.replace('Bearer ', '');
     if (!token) {
-        throw new ApiError(401, "Unauthorized");
+        console.log(req.headers);
+        throw new ApiError(401, "Unauthorized -- Token Not Found");
     }
     try {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
