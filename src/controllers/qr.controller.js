@@ -125,8 +125,8 @@ const oneqr = asyncHandler(async (req, res) => {
         return ApiResponse.success(res, {data : responses, logs : response.data}, "Data Verified Successfully");
 
     } catch (error) {
-        console.error("Error in oneqr function:", error.message || error);
-        throw new ApiError(405, error.message || "Error in data verification");
+        console.error("Error in oneqr function:", error || error);
+        throw new ApiError(405, error || "Error in data verification");
     }
 });
 

@@ -15,7 +15,10 @@ const adminMiddleware = asyncHandler(async (req, res, next) => {
         }
         next();
     } catch (error) {
-        throw new ApiError(401, "Unauthorized -- "+error.message);
+        if (error.message === "jwt expired") {
+            throw new ApiError(401, "Token Expired");
+        }
+        throw new ApiError(401, "Unauthorized -- " + error.message);
     }
 });
 
@@ -33,7 +36,10 @@ const securityMiddleware = asyncHandler(async (req, res, next) => {
         }
         next();
     } catch (error) {
-        throw new ApiError(401, error.message);
+        if (error.message === "jwt expired") {
+            throw new ApiError(401, "Token Expired");
+        }
+        throw new ApiError(401, "Unauthorized -- " + error.message);
     }
 });
 
