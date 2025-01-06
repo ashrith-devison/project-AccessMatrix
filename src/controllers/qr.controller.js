@@ -93,42 +93,87 @@ const oneqr = asyncHandler(async (req, res) => {
             }
 
         }
-
-        if ('avp' in data && data.avp && data.option === 'vehicle') {
-            const avpData = decode(data.avp);
-            const response = await axios.get(`${process.env.API_URL}/api/AVP/id/${avpData}`, {
+        if ('aep' in data && data.aep && (data.option === 'vehicle')) {
+            const response = await axios.get(`${process.env.API_URL}/api/AEP/${data.aep}`, {
                 headers: {
-                    "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : req.headers.authorization,
+                    "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : req.headers.authorization ,
                     "sessionData": req.cookies.SESSIONDATA
                 }
             });
-            responses.avp = response.data;
-            packet.IdType = "AVP";
-            packet.Id = data.avp;
+            responses.aep = response.data;
+            packet.IdType = "AEP";
+            packet.Id = data.aep;
+            if(new Date(response.data.data.DateofExpiry) < currentDateIST){
+                return ApiResponse.error(res, "AEP Expired", 405);
+            }
+            if(response.data.data.status === "BLOCKED"){
+                return ApiResponse.error(res, "AEP is Blocked", 405);
+            }
+            if(!response.data.data.Locations.includes(data.location)){
+                return ApiResponse.error(res, "Access Denied", 405);
+            }
 
-            if(new Date(response.data.data.AVP.AVPValidity) < currentDateIST){
-                return ApiResponse.error(res, "AVP Expired", 405);
+            if ('avp' in data && data.avp && data.option === 'vehicle') {
+                const avpData = decode(data.avp);
+                const response = await axios.get(`${process.env.API_URL}/api/AVP/id/${avpData}`, {
+                    headers: {
+                        "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : req.headers.authorization,
+                        "sessionData": req.cookies.SESSIONDATA
+                    }
+                });
+                responses.avp = response.data.data;
+                packet.IdType = "AVP";
+                packet.Id = data.avp;
+    
+                if(new Date(response.data.data.AVP.AVPValidity) < currentDateIST){
+                    return ApiResponse.error(res, "AVP Expired", 405);
+                }
+                if(response.data.data.AVP.status === "BLOCKED"){
+                    return ApiResponse.error(res, "AVP is Blocked", 405);
+                }
             }
-            if(response.data.data.AVP.status === "BLOCKED"){
-                return ApiResponse.error(res, "AVP is Blocked", 405);
-            }
+    
+
         }
-
         packet.Id = decode(packet.Id);
         packet.location = data.location;
-        const response = await axios.post(`${process.env.API_URL}/api/log/`,packet, {
-            headers: {
-                "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : "",
-                "sessionData": req.cookies.SESSIONDATA
+        if(req.params?.option === "log"){
+            return makeLogEntry(req, res, packet);
+        }
+        if (Object.keys(responses).length === 0) {
+            if(data.option === "employee"){
+                return ApiResponse.error(res, "AEP is Missing", 420);
             }
-        });
-        return ApiResponse.success(res, {data : responses, logs : response.data}, "Data Verified Successfully");
-
+            if(data.option === "driver"){
+                return ApiResponse.error(res, "AEP or ADP are Missing", 420);
+            }
+            if(data.option === "vehicle"){
+                return ApiResponse.error(res, "AEP or AVP are Missing", 420);
+            }
+        }
+        else if (Object.keys(responses).length === 1) {
+            if(data.option === "driver"){
+                return ApiResponse.error(res, "ADP is Missing", 420);
+            }
+            if(data.option === "vehicle"){
+                return ApiResponse.error(res, "AVP is Missing", 420);
+            }
+        }
+        return ApiResponse.success(res, {data : responses}, "Data Verified Successfully");
     } catch (error) {
         console.error("Error in oneqr function:", error || error);
         throw new ApiError(405, error || "Error in data verification");
     }
 });
 
+const makeLogEntry = asyncHandler(async (req, res, packet) => {
+    const response = await axios.post(`${process.env.API_URL}/api/log/`, packet, {
+        headers: {
+            "authorization": req.cookies.accessToken ? `Bearer ${req.cookies.accessToken}` : "",
+            "sessionData": req.cookies.SESSIONDATA
+        }
+    });
+    return ApiResponse.success(res, { logs: response.data }, "Data Verified Successfully");
+});
 
 export { qrverify, oneqr };
