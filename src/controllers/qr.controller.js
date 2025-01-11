@@ -45,6 +45,7 @@ const oneqr = asyncHandler(async (req, res) => {
         IdType: "",
         Id: ""
     };
+    if(!(data.option || data.location)) return ApiResponse.error(res, "Option or Location is Missing", 420);
     try {
         const currentDateIST = moment().tz("Asia/Kolkata").toDate();
         if ('aep' in data && data.aep && (data.option === 'driver' || data.option === 'employee')) {
