@@ -4,6 +4,17 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { logRecord } from "../models/logbook.model.js";
 
+const canCreateEntry = async(entryTime )  =>{
+    const currentTime = new Date();
+    const timeDiff = currentTime - entryTime;
+    const bufferTime = 3* 60 * 1000; // 10 minutes
+    if(timeDiff >= bufferTime) return {op : true, message : "Proceed to exit entry"};
+    else{
+        const remTime = bufferTime - timeDiff;
+        return {op : false, message : "Entry was done, please wait for "+remTime/60000+" minutes for exit entry"};
+    }
+};
+
 const updateExitEntry = async(IdType, Id ) => {
     const startOfDay = new Date();
     startOfDay.setUTCHours(0, 0, 0, 0);
@@ -18,18 +29,22 @@ const updateExitEntry = async(IdType, Id ) => {
     }).sort({ entryTime: -1 }
     );
     if (records.length > 0) {
-        if(records[0].entryTime.toISOString() === records[0].exitTime.toISOString()){
+        const canCreate = await canCreateEntry(records[0].entryTime);
+        if(canCreate.op === false){
+            return {success : 'false-entry', message : canCreate.message};
+        }
+        else if (records[0].entryTime.toISOString() === records[0].exitTime.toISOString()) {
             const updatedRecord = await logRecord.updateOne(
                 { _id: records[0]._id }, 
                 { $set: { exitTime: new Date() } } 
             );
-            
-            return {updatedRecord,success : "true"};
+            return { updatedRecord, success: "true" };
         }
-        return {success : "false"};
+        return { success: "false" };
     }
-    return {success : "false"};
-}
+    return { success: "false" };
+};
+
 const updateExitEntryOneTime = async (req, res) => {
     const { IdType, Id } = req.body;
     const data = await updateExitEntry(IdType, Id);
@@ -45,8 +60,12 @@ const createEntry = async (req, res) => {
     const exitUpdateResponse = await updateExitEntry(IdType, Id);
     if (exitUpdateResponse.success === 'true') 
         return ApiResponse.success(res, exitUpdateResponse,"Exit Time Updated Successfully");
-    const log = await logRecord.create({ validatedId: IdType, Id, location });
-    return ApiResponse.success(res, log, "Entry created successfully");
+    else if (exitUpdateResponse.success === 'false-entry') 
+        return ApiResponse.error(res,exitUpdateResponse.message,200,false,exitUpdateResponse);
+    else {
+        const log = await logRecord.create({ validatedId: IdType, Id, location });
+        return ApiResponse.success(res, log, "Entry created successfully");
+    }
 };
 
 

@@ -174,7 +174,11 @@ const makeLogEntry = asyncHandler(async (req, res, packet) => {
             "sessionData": req.cookies.SESSIONDATA
         }
     });
-    return ApiResponse.success(res, { logs: response.data }, "Data Verified Successfully");
+    if(response.data.success === false){
+        return res.status(response.status).json(response.data);
+    }
+    else
+        return ApiResponse.success(res, { logs: response.data }, "Data Verified Successfully");
 });
 
 export { qrverify, oneqr };
