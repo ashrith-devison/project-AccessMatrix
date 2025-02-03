@@ -46,4 +46,19 @@ const ADPschema = new mongoose.Schema({
     },
 },{timestamps: true});
 
+ADPschema.pre('save', async function (next){
+   if(this.isNew){
+    try{
+        const aep = await AEP.findById(this.AEP);
+        if(aep)
+            this.Name = aep.EmployeeName;
+    }
+    catch(err){
+        console.log(err);
+        next(err);
+    }
+   }
+    next();
+});
+
 export const ADP = mongoose.model('ADP', ADPschema);

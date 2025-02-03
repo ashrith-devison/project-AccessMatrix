@@ -20,10 +20,10 @@ const createADP = asyncHandler(async (req, res) => {
         throw new ApiError(400, 'ADP already exists');
     }
     const aep = await AEP.findOne({ AEPId: AEPId });
-    const aepADPExists = await ADP.findOne({ AEP: aep._id });
     if (!aep) {
         throw new ApiError(404, 'AEP not found');
     }
+    const aepADPExists = await ADP.findOne({ AEP: aep._id });
     if (aepADPExists) {
         throw new ApiError(400, 'AEP already has an ADP');
     }
