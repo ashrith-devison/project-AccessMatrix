@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import { AEP } from './AEP.model';
+import { AEP } from './AEP.model.js';
 const AVPschema = new mongoose.Schema({
     AVPId: {
         type: String,
