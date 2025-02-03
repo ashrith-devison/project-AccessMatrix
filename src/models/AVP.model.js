@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-
+import { AEP } from './AEP.model';
 const AVPschema = new mongoose.Schema({
     AVPId: {
         type: String,
@@ -49,4 +49,18 @@ const AVPschema = new mongoose.Schema({
     },
 },{timestamps: true});
 
+AVPschema.pre('save', async function (next){
+    if(this.isNew){
+        try{
+            const aep = await AEP.findById(this.AEP);
+            if(aep){
+                this.Name = aep.EmployeeName;
+            }
+        }
+        catch(err){
+            console.log(err);
+            next(err);
+        }
+    }
+});
 export const AVP = mongoose.model('AVP', AVPschema);
