@@ -4,6 +4,8 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { logRecord } from "../models/logbook.model.js";
 import { AEP } from "../models/AEP.model.js";
+import { ADP } from "../models/ADP.model.js";
+import { AVP } from "../models/AVP.model.js";
 
 const canCreateEntry = async(entryTime )  =>{
     const currentTime = new Date();
@@ -82,6 +84,14 @@ const getAllLogBooks = asyncHandler(async (req, res) => {
         if(log[i].validatedId === 'AEP'){
             const aep = await AEP.findById(log[i].Id);
             log[i] = {...log[i]._doc, name: aep?.EmployeeName};
+        }
+        else if(log[i].validatedId === 'ADP'){
+            const adp = await ADP.findById(log[i].Id);
+            log[i] = {...log[i]._doc, name: adp?.Name};
+        }
+        else if(log[i].validatedId === 'AVP'){
+            const avp = await AVP.findById(log[i].Id);
+            log[i] = {...log[i]._doc, name: avp?.Name};
         }
     }
     return ApiResponse.success(res, log, "Logbook fetched successfully");
