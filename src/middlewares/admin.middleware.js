@@ -1,4 +1,5 @@
 import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
 
@@ -37,7 +38,7 @@ const securityMiddleware = asyncHandler(async (req, res, next) => {
         next();
     } catch (error) {
         if (error.message === "jwt expired") {
-            throw new ApiError(401, "Token Expired");
+            return ApiResponse.error(res, "Token Expired", 201, false);
         }
         throw new ApiError(401, "Unauthorized -- " + error.message);
     }

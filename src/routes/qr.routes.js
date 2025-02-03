@@ -5,6 +5,6 @@ const router = Router();
 
 router.route("/:id").get(qrverify);
 // router.route("/").post(qrCreate);
-router.route("/oneqr/:option?").post(oneqr);
+router.route("/oneqr/:option?").post(securityMiddleware,oneqr);
 
 export default router;

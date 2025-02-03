@@ -3,6 +3,7 @@ import { User } from "../models/users.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { logRecord } from "../models/logbook.model.js";
+import { AEP } from "../models/AEP.model.js";
 
 const canCreateEntry = async(entryTime )  =>{
     const currentTime = new Date();
@@ -76,7 +77,13 @@ const getLogBookById = asyncHandler(async (req, res) => {
 });
 
 const getAllLogBooks = asyncHandler(async (req, res) => {
-    const log = await logRecord.find();
+    let log = await logRecord.find();
+    for(let i=0; i<log.length; i++){
+        if(log[i].validatedId === 'AEP'){
+            const aep = await AEP.findById(log[i].Id);
+            log[i] = {...log[i]._doc, name: aep?.EmployeeName};
+        }
+    }
     return ApiResponse.success(res, log, "Logbook fetched successfully");
 });
 
